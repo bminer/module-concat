@@ -18,10 +18,10 @@ var fs = require("fs")
 	, stride = require("stride");
 
 // Read main header/footer and header/footer for each file in the project
-var header = fs.readFileSync("./lib/header.js").toString("utf8"),
-	footer = fs.readFileSync("./lib/footer.js").toString("utf8"),
-	fileHeader = fs.readFileSync("./lib/fileHeader.js").toString("utf8"),
-	fileFooter = fs.readFileSync("./lib/fileFooter.js").toString("utf8");
+var header = fs.readFileSync(__dirname + "/lib/header.js").toString("utf8")
+	, footer = fs.readFileSync(__dirname + "/lib/footer.js").toString("utf8")
+	, fileHeader = fs.readFileSync(__dirname + "/lib/fileHeader.js").toString("utf8")
+	, fileFooter = fs.readFileSync(__dirname + "/lib/fileFooter.js").toString("utf8");
 
 /* Concatenate all modules within a project.
 	The procedure works like this:
