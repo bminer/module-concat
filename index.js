@@ -90,10 +90,10 @@ module.exports = function concat(entryModule, outputFile, cb) {
 	}).once("done", function(err) {
 		if(fd) {
 			fs.close(fd, function(closeErr) {
-				cb(err || closeErr);
+				cb(err || closeErr, files);
 			});
 		} else {
-			cb(err);
+			cb(err, files);
 		}
 	});
 
@@ -174,9 +174,7 @@ module.exports = function concat(entryModule, outputFile, cb) {
 			}
 			// Pass the `args` Array to stride, and kick off the processing
 			stride.apply(null, args).once("done", this);
-		}).once("done", function(err) {
-			cb(err, files);
-		});
+		}).once("done", cb);
 	}
 };
 
@@ -191,7 +189,9 @@ if(require.main === module) {
 			console.error("Error", err.stack);
 			process.exit(1);
 		}
-		else
+		else {
+			console.log(files.length + " files written to " + process.argv[3] + ".");
 			console.log("Completed successfully.");
+		}
 	});
 }
