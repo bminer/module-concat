@@ -63,8 +63,37 @@ var header = fs.readFileSync(__dirname + "/lib/header.js").toString("utf8")
 		- Certain `require` statements replaced with `__require`
 		- All `__dirname` and `__filename` references replaced with
 			`__getDirname(...)` and `__getFilename(...)` references.
+
+	`modConcat(entryModule, outputFile, [options,] cb)`
+
+	- `entryModule` - the path to the entry point of the project to be
+		concatenated.  This might be an `index.js` file, for example.
+	- `outputFile` - the path where the concatenated project file will be
+		written.
+	- `options` - Optional.  An Object containing any of the following:
+		- `outputStreamOptions` - Options passed to `fs.createWriteStream` call
+			when the `outputFile` is opened for writing.  Defaults to `null`.
+		- `excludeFiles` - An Array of files that should be excluded from the
+			project even if they were referenced by a `require(...)`.
+
+			Note: These `require` statements should probably be wrapped in a
+			try, catch block to prevent uncaught exceptions.
+	- `cb` - Callback of the form `cb(err, files)` where `files` is an Array
+		of files that have been included in the project.
 */
-module.exports = function concat(entryModule, outputFile, cb) {
+module.exports = function concat(entryModule, outputFile, opts, cb) {
+	// Reorganize arguments
+	if(typeof opts === "function") {
+		cb = opts;
+		opts = {};
+	}
+	opts = opts || {};
+	// Ensure that all paths have been resolved
+	if(opts.excludeFiles) {
+		for(var i = 0; i < opts.excludeFiles.length; i++) {
+			opts.excludeFiles[i] = path.resolve(opts.excludeFiles[i]);
+		}
+	}
 	// A list of all of the files read and included in the output thus far
 	var files = [];
 	// The file descriptor pointing to the `outputFile`
@@ -73,7 +102,7 @@ module.exports = function concat(entryModule, outputFile, cb) {
 	stride(function writeMainHeader() {
 		var cb = this;
 		// Open WriteStream
-		var out = fs.createWriteStream(outputFile);
+		var out = fs.createWriteStream(outputFile, opts.outputStreamOptions);
 		out.on("open", function(_fd) {
 			// Save the file descriptor
 			fd = _fd;
@@ -133,7 +162,15 @@ module.exports = function concat(entryModule, outputFile, cb) {
 						var index = files.indexOf(modulePath);
 						if(index < 0) {
 							// Not found; add this module to the project
-							index = files.push(modulePath) - 1;
+							if(!opts.excludeFiles ||
+								opts.excludeFiles.indexOf(modulePath) < 0)
+							{
+								index = files.push(modulePath) - 1;
+							}
+							else {
+								// Ignore; do not replace
+								return match;
+							}
 						}
 						// Replace the `require` statement with `__require`
 						return "__require(" + index + ")";
