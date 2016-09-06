@@ -148,7 +148,14 @@ module.exports = function concat(entryModule, outputFile, opts, cb) {
 			fs.readFile(filePath, {"encoding": "utf8"}, this);
 		}, function processFile(code) {
 			// Scan file for `require(...)`, `__dirname`, and `__filename`
-			var requireRegex = /require\s*\(\s*(\s*["'])((?:(?=(\\?))\3.)*?)\1\s*\)/g,
+			/* Quick notes about the somewhat intense `requireRegex`:
+				- require('...') and require("...") is matched
+					- The single or double quote matched is group 1
+				- Whitespace can go anywhere
+				- The module path matched is group 2
+				- Backslashes in the module path are escaped (i.e. for Windows paths)
+			*/
+			var requireRegex = /require\s*\(\s*(["'])((?:(?=(\\?))\3.)*)\1\s*\)/g,
 				dirnameRegex = /__dirname/g,
 				filenameRegex = /__filename/g;
 			code = code.replace(requireRegex, function(match, quote, modulePath) {
