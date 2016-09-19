@@ -1,6 +1,6 @@
 {
 	"name": "node-module-concat",
-	"version": "1.3.0",
+	"version": "1.4.0",
 	"description": "Node.js module concatenation library",
 	"main": "index.js",
 	"dependencies": {
@@ -19,6 +19,7 @@
 		"module",
 		"concatenate",
 		"obfuscation",
+		"obfuscate",
 		"require"
 	],
 	"author": "Blake Miner <miner.blake@gmail.com>",

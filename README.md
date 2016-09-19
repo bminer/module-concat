@@ -40,8 +40,12 @@ modConcat("./project/index.js", outputFile, function(err, files) {
 
 		Note: These `require` statements should probably be wrapped in a
 		try, catch block to prevent uncaught exceptions.
-- `cb` - Callback of the form `cb(err, files)` where `files` is an Array
-	of files that have been included in the project.
+	- `includeNodeModules` - Set to `true` if node_modules should also be
+		included in the project.
+- `cb` - Callback of the form `cb(err, files, nativeModules)` where `files` is
+	an Array of files that have been included in the project and
+	`nativeModules` is an Array of native modules that were found (but not
+	included) when scanning the project.
 
 ## Known limitations
 - Dynamic `require()` statements don't work

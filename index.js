@@ -78,6 +78,8 @@ var header = fs.readFileSync(__dirname + "/lib/header.js").toString("utf8")
 
 			Note: These `require` statements should probably be wrapped in a
 			try, catch block to prevent uncaught exceptions.
+		- `includeNodeModules` - Set to `true` if node_modules should be
+			included in the `outputFile`
 	- `cb` - Callback of the form `cb(err, files)` where `files` is an Array
 		of files that have been included in the project.
 */
@@ -94,8 +96,22 @@ module.exports = function concat(entryModule, outputFile, opts, cb) {
 			opts.excludeFiles[i] = path.resolve(opts.excludeFiles[i]);
 		}
 	}
+	// Ensure that `includeNodeModules` will work properly
+	var _nodeModulePaths;
+	if(opts.includeNodeModules) {
+		try {
+			_nodeModulePaths = require("module")._nodeModulePaths;
+			if(typeof _nodeModulePaths !== "function") {
+				opts.includeNodeModules = false;
+			}
+		} catch(err) {
+			opts.includeNodeModules = false;
+		}
+	}
 	// A list of all of the files read and included in the output thus far
 	var files = [];
+	// A list of all of the native modules not included in the output thus far
+	var nativeModules = [];
 	// The file descriptor pointing to the `outputFile`
 	var fd;
 
@@ -119,10 +135,10 @@ module.exports = function concat(entryModule, outputFile, opts, cb) {
 	}).once("done", function(err) {
 		if(fd) {
 			fs.close(fd, function(closeErr) {
-				cb(err || closeErr, files);
+				cb(err || closeErr, files, nativeModules);
 			});
 		} else {
-			cb(err, files);
+			cb(err, files, nativeModules);
 		}
 	});
 
@@ -147,48 +163,83 @@ module.exports = function concat(entryModule, outputFile, opts, cb) {
 			// Read file
 			fs.readFile(filePath, {"encoding": "utf8"}, this);
 		}, function processFile(code) {
+			// Remove some line comments from code
+			code = code.replace(/(?:\r\n?|\n)\s*\/\/.*/g, "");
 			// Scan file for `require(...)`, `__dirname`, and `__filename`
 			/* Quick notes about the somewhat intense `requireRegex`:
 				- require('...') and require("...") is matched
 					- The single or double quote matched is group 1
 				- Whitespace can go anywhere
 				- The module path matched is group 2
-				- Backslashes in the module path are escaped (i.e. for Windows paths)
+				- Backslashes are allowed as escape characters only if followed
+					by another backlash (to support Windows paths)
 			*/
-			var requireRegex = /require\s*\(\s*(["'])((?:(?=(\\?))\3.)*)\1\s*\)/g,
+			var requireRegex = /require\s*\(\s*(["'])((?:(?:(?!\1)[^\\]|(?:\\\\)))*)\1\s*\)/g,
 				dirnameRegex = /__dirname/g,
 				filenameRegex = /__filename/g;
 			code = code.replace(requireRegex, function(match, quote, modulePath) {
+				// First thing is to replace "\\" with "\"
+				modulePath = modulePath.replace("\\\\", "\\");
 				// Check to see if this require path begins with "./" or "../" or "/"
 				if(modulePath.match(/^\.?\.?\//) !== null) {
 					try {
 						modulePath = require.resolve(path.resolve(
 							path.join(path.dirname(filePath), modulePath)
 						) );
-						// Lookup this module's ID
-						var index = files.indexOf(modulePath);
-						if(index < 0) {
-							// Not found; add this module to the project
-							if(!opts.excludeFiles ||
-								opts.excludeFiles.indexOf(modulePath) < 0)
-							{
-								index = files.push(modulePath) - 1;
-							}
-							else {
-								// Ignore; do not replace
-								return match;
-							}
-						}
-						// Replace the `require` statement with `__require`
-						return "__require(" + index + ")";
+						// Include module in project at end of this function
 					} catch(e) {
 						// Ignore; do not replace
 						return match;
 					}
+				} else if(opts.includeNodeModules) {
+					var oldPaths = module.paths;
+					/* Temporarily overwrite `module.paths` to make
+						`require.resolve` work properly */
+					module.paths = _nodeModulePaths(path.dirname(filePath) );
+					try {
+						var modulePath = require.resolve(modulePath);
+					} catch(err) {
+						// Module not found; do not replace
+						return match;
+					} finally {
+						// Restore old `module.paths`
+						module.paths = oldPaths;
+					}
+					// Detect core module
+					if(modulePath.match(/^[a-z_]+$/) ) {
+						// Core module; do not replace
+						return match;
+					}
+					// Include module in project at end of this function
 				} else {
 					// Ignore; do not replace
 					return match;
 				}
+				/* If we reached this point, we need to include `modulePath`
+					in our project */
+				// If this is a native module, abort
+				if(path.extname(modulePath).toLowerCase() === ".node") {
+					// This is a native module; do not replace
+					nativeModules.push(modulePath);
+					return match;
+				}
+				// Lookup this module's ID
+				var index = files.indexOf(modulePath);
+				if(index < 0) {
+					// Not found; add this module to the project
+					if(!opts.excludeFiles ||
+						opts.excludeFiles.indexOf(modulePath) < 0)
+					{
+						index = files.push(modulePath) - 1;
+					}
+					else {
+						// Ignore; do not replace
+						return match;
+					}
+				}
+				// Replace the `require` statement with `__require`
+				var parentIndex = files.indexOf(filePath);
+				return "__require(" + index + "," + parentIndex + ")";
 			})
 			// Replace `__dirname` with `__getDirname(...)`
 			.replace(dirnameRegex, "__getDirname(" +
