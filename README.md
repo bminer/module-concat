@@ -16,9 +16,9 @@ each file is written just like a Node.js module.
 ```javascript
 var modConcat = require("node-module-concat");
 var outputFile = "./project/concatenated.js";
-modConcat("./project/index.js", outputFile, function(err, files) {
+modConcat("./project/index.js", outputFile, function(err, stats) {
 	if(err) throw err;
-	console.log(files.length + " were combined into " + outputFile);
+	console.log(stats.files.length + " were combined into " + outputFile);
 });
 ```
 
