@@ -28,7 +28,6 @@ function modConcat(entryModule, outputPath, opts, cb) {
 			}
 		});
 		project.pipe(out);
-		setTimeout(() => project.pause(), 1);
 	});
 	// Call `cb` if it was provided; otherwise return the Promise
 	if(typeof cb === "function") {
