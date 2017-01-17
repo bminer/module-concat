@@ -1,7 +1,12 @@
 var fs = require("fs")
 	, hello = require("./lib/hello")
 	, world = require("./lib/world")
-	, func = require("./lib/func");
+	, func = require("./lib/func")
+	, cool = require("cool");
+
+try {
+	let foo = require("notfound");
+} catch(e) {}
 
 console.log(hello.hello + ", " + world.world);
 console.log(fs.readFileSync(__filename).toString() );
@@ -15,3 +20,4 @@ if(require.main === module) {
 } else {
 	console.log("index is **NOT** main!");
 }
+console.log(cool);
