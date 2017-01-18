@@ -50,8 +50,14 @@ of the concatenated project.
 
 		Note: These `require` statements should probably be wrapped with a
 		conditional or a try/catch block to prevent uncaught exceptions.
-	- `excludeNodeModules` - Set to `true` if modules loaded from
-		`node_modules` folders should be excluded from the project.
+	- `excludeNodeModules` - (boolean or Array) Set to `true` if all modules
+		loaded from `node_modules` folders should be excluded from the project.
+		Alternatively, set to an Array of module names to be excluded from the
+		project.
+
+		For example, `require("foobar")` will not be replaced if
+		`excludeNodeModules` is set to an Array containing `"foobar"` or if
+		`excludeNodeModules` is set to `true`.
 	- `extensions` - An Array of extensions that will be appended to the
 		required module path to search for the module in the file system.
 		Defaults to `[".js", ".json"]`.
@@ -95,6 +101,10 @@ of the concatenated project.
 		`node_modules`, the `browser` field in the `package.json` file (if
 		found) is used to determine which file to actually include in the
 		project.
+	- `allowUnresolvedModules` - Set to `true` to prevent unresolved modules
+		from throwing an Error; instead, the `require(...)` expression will not
+		be replaced, and the unresolved module will be added to
+		`stats.unresolvedModules` (see below).  Defaults to `false`.
 	- Any [option supported by resolve.sync]
 		(https://github.com/substack/node-resolve#resolvesyncid-opts) except
 		`basedir` and `packageFilter`, which can be overwritten.
@@ -109,6 +119,11 @@ is no more data to consume.  Properties include:
 - `files` - An Array of files included in the project
 - `addonsExcluded` - An Array of files excluded from the project because
 	they are native C/C++ add-ons.
+- `unresolvedModules` - An Array of modules that could not be included in the
+	project because they could not be found.  Each element in the Array is an
+	Object containing these properties:
+	- `parent` - the full path of the file containing the require expression
+	- `module` - the name or path to the module that could not be found
 
 **`modConcat(entryModule, outputPath, [options, cb])`**
 

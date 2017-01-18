@@ -1,3 +1,12 @@
+# 2.1.0
+
+- Now defaults to throwing an Error when a required module is not found, but
+	this behavior can be changed by setting `options.allowUnresolvedModules`
+- `options.excludeNodeModules` can now be set to `true` or to an Array
+	containing modules to be excluded from the project
+- `stats.unresolvedModules` contains information about modules that could not
+	be found.  Only relevant when `options.allowUnresolvedModules` is `true`.
+
 # 2.0.0
 
 Almost a complete re-write of the original project.

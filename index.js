@@ -53,11 +53,15 @@ if(require.main === module) {
 	}
 	modConcat(process.argv[2], process.argv[3], function(err, stats) {
 		if(err) {
-			console.error("Error", err.stack);
+			console.error("An error occurred:\n", err.stack);
 			process.exit(1);
 		} else {
 			console.log(stats.files.length + " files written to " +
 				process.argv[3] + ".");
+			if(stats.unresolvedModules.length) {
+				console.log("The following modules could not be resolved:\n",
+					stats.unresolvedModules);
+			}
 			console.log("Completed successfully.");
 		}
 	});
