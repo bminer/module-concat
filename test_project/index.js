@@ -21,4 +21,4 @@ if(require.main === module) {
 	console.log("index is **NOT** main!");
 }
 console.log(cool);
-console.log("node-module-concat version:", require("../package.json").version);
+console.log("module-concat version:", require("../package.json").version);

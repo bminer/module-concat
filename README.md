@@ -1,4 +1,4 @@
-# node-module-concat
+# module-concat
 Fairly lightweight CommonJS module concatenation tool
 
 ## What is it?
@@ -15,12 +15,14 @@ single JavaScript file.  This project has one dependency:
 
 ## Install
 
-`npm install node-module-concat`
+`npm install module-concat`
+
+**Note**: Used to be called `node-module-concat` but has since been renamed.
 
 ## Usage
 
 ```javascript
-var modConcat = require("node-module-concat");
+var modConcat = require("module-concat");
 var outputFile = "./project/concatenated.js";
 modConcat("./project/index.js", outputFile, function(err, stats) {
 	if(err) throw err;
@@ -30,7 +32,7 @@ modConcat("./project/index.js", outputFile, function(err, stats) {
 
 ## API
 
-`var modConcat = require("node-module-concat");`
+`var modConcat = require("module-concat");`
 
 **`var stream = new modConcat.ModuleConcatStream(entryModulePath [, options])`**
 
@@ -77,7 +79,7 @@ of the concatenated project.
 		addons and are always excluded from the build.
 	- `compilers` - An Object describing how files with certain file extensions
 		should be compiled to JavaScript before being included in the project.
-		The example below will allow node-module-concat to handle `require`
+		The example below will allow module-concat to handle `require`
 		statements pointing to *.coffee files (i.e. `require("./foo.coffee")`).
 		These modules are compiled using the coffee-script compiler before
 		they are included in the project.

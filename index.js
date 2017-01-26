@@ -1,4 +1,4 @@
-/* node-module-concat
+/* module-concat
 	CommonJS module concatenation library
 */
 const fs = require("fs"),

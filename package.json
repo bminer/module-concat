@@ -1,6 +1,6 @@
 {
-	"name": "node-module-concat",
-	"version": "2.1.0",
+	"name": "module-concat",
+	"version": "2.1.1",
 	"description": "Lightweight CommonJS module concatenation tool",
 	"main": "index.js",
 	"dependencies": {
@@ -12,7 +12,7 @@
 	},
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/bminer/node-module-concat.git"
+		"url": "https://github.com/bminer/module-concat.git"
 	},
 	"keywords": [
 		"node",
@@ -27,7 +27,7 @@
 	"author": "Blake Miner <miner.blake@gmail.com>",
 	"license": "MIT",
 	"bugs": {
-		"url": "https://github.com/bminer/node-module-concat/issues"
+		"url": "https://github.com/bminer/module-concat/issues"
 	},
-	"homepage": "https://github.com/bminer/node-module-concat"
+	"homepage": "https://github.com/bminer/module-concat"
 }
