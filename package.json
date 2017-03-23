@@ -1,6 +1,6 @@
 {
 	"name": "module-concat",
-	"version": "2.1.2",
+	"version": "2.1.4",
 	"description": "Lightweight CommonJS module concatenation tool",
 	"main": "index.js",
 	"dependencies": {
