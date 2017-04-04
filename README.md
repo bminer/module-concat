@@ -107,11 +107,9 @@ of the concatenated project.
 		from throwing an Error; instead, the `require(...)` expression will not
 		be replaced, and the unresolved module will be added to
 		`stats.unresolvedModules` (see below).  Defaults to `false`.
-	- Any [option supported by resolve.sync]
-		(https://github.com/substack/node-resolve#resolvesyncid-opts) except
+	- Any [option supported by resolve.sync](https://github.com/substack/node-resolve#resolvesyncid-opts) except
 		`basedir` and `packageFilter`, which can be overwritten.
-	- Any [option supported by the Readable class]
-		(https://nodejs.org/api/stream.html#stream_new_stream_readable_options)
+	- Any [option supported by the Readable class](https://nodejs.org/api/stream.html#stream_new_stream_readable_options)
 
 **`stream.getStats()`**
 
