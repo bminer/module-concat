@@ -103,10 +103,25 @@ of the concatenated project.
 		`node_modules`, the `browser` field in the `package.json` file (if
 		found) is used to determine which file to actually include in the
 		project.
+
+		module-concat provides limited support of the package.json
+		[`browser` field spec](https://github.com/defunctzombie/package-browser-field-spec).
+		More specifically, it will properly handle the "basic" case where
+		`browser` is a string.  When `browser` is an Object, module-concat
+		only works properly in certain instances.  For example, if the specific
+		file replaced matches the `main` field, it works fine.  Also, if a
+		specific file is ignored (i.e. value is set to `false`), its resolved
+		path is simply added to the `excludeFiles` array.
+
+		Unfortunately, ignoring module names (i.e. not specific files) is not
+		supported.  Also, replacing module names (or specific files) do not work
+		if the replaced file does not match the `main` field.  This might be
+		improved in the future...
 	- `allowUnresolvedModules` - Set to `true` to prevent unresolved modules
 		from throwing an Error; instead, the `require(...)` expression will not
 		be replaced, and the unresolved module will be added to
-		`stats.unresolvedModules` (see below).  Defaults to `false`.
+		`stats.unresolvedModules` (see below).  Defaults to `false` so Errors
+		are thrown for unresolved modules.
 	- Any [option supported by resolve.sync](https://github.com/substack/node-resolve#resolvesyncid-opts) except
 		`basedir` and `packageFilter`, which can be overwritten.
 	- Any [option supported by the Readable class](https://nodejs.org/api/stream.html#stream_new_stream_readable_options)
@@ -144,3 +159,5 @@ the following options and pipes the concatenated project to the `outputPath`.
 	(i.e. `require("./" + variable)`)
 - `require.resolve` calls are not modified
 - `require.cache` statements are not modified
+- Limited support of [package `browser` field spec](https://github.com/defunctzombie/package-browser-field-spec)
+- Won't add any horsepower to your sports car.  :(
