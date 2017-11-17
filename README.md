@@ -85,10 +85,24 @@ of the concatenated project.
 		they are included in the project.
 		```javascript
 		{
-			".coffee": (src, options) => require("coffee-script").compile(src)
+			// Sample compiler for coffee-script
+			".coffee": (src, options, path) => require("coffee-script").compile(src),
+			// Sample compiler for Riot.js tags
+			".tag": (src, options, path) =>
+				// Note: Variable `riot` needs to be available in the tag module
+				"const riot = require('riot');" +
+					// The compiled tag will contain references to `riot`
+					riot.compile(src, {
+						// Maybe the *.tag files are Pug templates?
+						"template": "pug",
+						// And maybe scoped styles are written in Stylus?
+						"style": "stylus",
+						"compact": true
+					}, path)
 		}
 		```
 		`options` are passed along to the compiler function, as shown above.
+		`path` is the path of the file being processed.
 
 		**Note**: By default, ".json" files are prepended with
 		`module.exports = `.  This behavior can be overwritten by explicitly
